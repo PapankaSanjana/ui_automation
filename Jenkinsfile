@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        PYTHON = "python3"
-        VENV = "venv"
-    }
-
     stages {
 
         stage('Checkout Code') {
@@ -15,10 +10,21 @@ pipeline {
             }
         }
 
+        stage('Install Python') {
+            steps {
+                sh '''
+                apt-get update
+                apt-get install -y python3 python3-pip python3-venv
+                '''
+            }
+        }
+
         stage('Verify Python') {
             steps {
-                sh 'python3 --version'
-                sh 'pip3 --version'
+                sh '''
+                python3 --version
+                pip3 --version
+                '''
             }
         }
 
@@ -59,13 +65,10 @@ pipeline {
 
     post {
         success {
-            echo 'Automation tests completed successfully!'
+            echo 'Tests completed successfully!'
         }
         failure {
-            echo 'Some tests failed!'
-        }
-        always {
-            echo 'Pipeline finished.'
+            echo 'Tests failed!'
         }
     }
 }
