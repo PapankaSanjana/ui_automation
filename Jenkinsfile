@@ -5,19 +5,28 @@ pipeline {
 
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/PapankaSanjana/ui_automation.git'
+                git branch: 'main',
+                url: 'https://github.com/PapankaSanjana/ui_automation.git'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                bat 'pip install -r requirements.txt'
+                sh '''
+                python3 -m venv venv
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Run Tests') {
             steps {
-                bat 'pytest --html=report.html'
+                sh '''
+                . venv/bin/activate
+                pytest tests -v --html=report.html
+                '''
             }
         }
 
@@ -26,6 +35,5 @@ pipeline {
                 archiveArtifacts artifacts: 'report.html'
             }
         }
-
     }
 }
